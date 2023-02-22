@@ -6,7 +6,7 @@
 /*   By: kurosawaitsuki <kurosawaitsuki@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:57:53 by kurosawaits       #+#    #+#             */
-/*   Updated: 2023/02/21 01:21:24 by kurosawaits      ###   ########.fr       */
+/*   Updated: 2023/02/21 20:56:10 by kurosawaits      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ static char	*join(char *str, char *read_str, ssize_t num_of_byte)
 			return_ptr = ft_strjoin(str, read_str);
 			free(str);
 			str = NULL;
+		}
+		if (!return_ptr)
+		{
+			free(read_str);
+			free(return_ptr);
+			return (NULL);
 		}
 		return (return_ptr);
 	}
@@ -53,6 +59,12 @@ static char	*setline(int fd, char *str)
 		}
 		else
 			str = join(str, read_str, num_of_byte);
+		if (!str)
+		{
+			free(str);
+			free(read_str);
+			return (NULL);
+		}
 		if (ft_strchr(str, '\n'))
 			break ;
 	}
@@ -72,7 +84,11 @@ static char	*getbeforenewline(char *str)
 	else
 		before_newline = ft_substr(str, 0, newline_ptr - str + 1);
 	if (!before_newline)
+	{
+		free(str);
+		free(before_newline);
 		return (NULL);
+	}
 	return (before_newline);
 }
 
@@ -83,14 +99,22 @@ static char	*getafternewline(char *str)
 
 	newline_ptr = ft_strchr(str, '\n');
 	if (!newline_ptr)
+	{
+		free(str);
 		return (NULL);
+	}
 	if (ft_strlen(newline_ptr) == 1)
 		after_newline = NULL;
 	else
 		after_newline = ft_substr(newline_ptr, 1, ft_strlen(newline_ptr) - 1);
 	if (!after_newline)
+	{
+		free(after_newline);
+		free(str);
 		return (NULL);
+	}
 	free(str);
+	str = NULL;
 	return (after_newline);
 }
 
@@ -108,5 +132,7 @@ char	*get_next_line(int fd)
 	if (!return_ptr)
 		return (NULL);
 	str = getafternewline(str);
+	if (!str)
+		return (NULL);
 	return (return_ptr);
 }
